@@ -8,6 +8,7 @@ contract ERC20 {
     string public name;
     string public symbol;
     uint8 public decimals;
+    address private owner;
 
     constructor(
         string memory _name,
@@ -17,6 +18,13 @@ contract ERC20 {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
+
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this method");
+        _;
     }
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -58,7 +66,7 @@ contract ERC20 {
         return true;
     }
 
-    function mint(uint256 amount) external {
+    function mint(uint256 amount) external onlyOwner {
         unchecked {
             balanceOf[msg.sender] += amount;
             totalSupply += amount;
@@ -66,7 +74,7 @@ contract ERC20 {
         emit Transfer(address(0), msg.sender, amount);
     }
 
-    function burn(uint256 amount) external {
+    function burn(uint256 amount) external onlyOwner {
         unchecked {
             balanceOf[msg.sender] -= amount;
             totalSupply -= amount;
